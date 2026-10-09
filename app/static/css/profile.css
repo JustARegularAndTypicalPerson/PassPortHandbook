@@ -1,0 +1,246 @@
+main.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+form {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: rgba(240, 240, 240, 0.5);
+    border-radius: 10px;
+}
+
+form>div {
+    margin-bottom: 1rem;
+}
+
+h1,
+h2 {
+    color: var(--primary-color);
+}
+
+p {
+    margin-top: 1rem;
+    font-size: 0.95em;
+}
+
+img {
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+
+
+form.delete-form {
+    margin-top: 1rem;
+}
+
+ul li.success {
+    color: green;
+}
+
+ul li.error {
+    color: red;
+}
+
+footer {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 4rem;
+    text-align: center;
+}
+
+
+#baka {
+    margin-top: 20px;
+    /* Пример верхнего отступа */
+    margin-bottom: 30px;
+    /* Пример нижнего отступа */
+
+}
+
+body {
+    font-family: sans-serif;
+    background-color: #fce4ec; /* Light Pink for light theme */
+    color: #000; /* Black text on light background */
+}
+
+.container {
+    background-color: #fff; /* White container background */
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e0b0ff; /* Light Purple border */
+    margin-bottom: 1rem;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 1rem;
+}
+
+nav ul li:last-child {
+    margin-right: 0;
+}
+
+nav a {
+    color: #a78cd3; /* Light Purple link color */
+    text-decoration: none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+    color: #d689c1; /* Pink heading color */
+}
+
+label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #c77dff; /* Purple label color */
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e0b0ff; /* Light Purple border */
+    border-radius: 3vw;
+    background-color: #f3e5f5; /* Slightly darker pink background */
+    color: #000; /* Black text */
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    background-color: #c77dff; /* Purple button background */
+    color: #fff; /* White text on button */
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 3vw;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #b159d3; /* Darker purple on hover */
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1rem;
+}
+
+ul li {
+    padding: 0.5rem;
+    border: 1px solid #f48fb1; /* Pink border for messages */
+    border-radius: 0.5rem;
+    background-color: #ffe6f9; /* Lightest pink for messages */
+    color: #f48fb1; /* Pink text for messages */
+}
+
+.error {
+    border-color: red;
+    color: red;
+    background-color: #ffe0e0;
+}
+
+a {
+    color: #a78cd3; /* Light Purple link color */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 3rem;
+    text-align: center;
+    color: #888; /* Grey for footer text */
+}
+
+/* Dark Theme */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1e1e1e; /* Dark background */
+        color: #fff; /* White text on dark background */
+    }
+
+    .container {
+        background-color: #333; /* Darker container background */
+        border-color: #a78cd3; /* Light Purple border */
+    }
+
+    nav {
+        border-bottom-color: #555;
+    }
+
+    nav a {
+        color: #d1aaff; /* Light Purple link color */
+    }
+
+    h1,
+    h2,
+    h3 {
+        color: #f4a9d8; /* Light Pink heading color */
+    }
+
+    label {
+        color: #e08bff; /* Light Purple label color */
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    select {
+        border-color: #c77dff; /* Purple border */
+        background-color: #444; /* Darker background */
+        color: #eee; /* Light text */
+    }
+
+    button[type="submit"] {
+        background-color: #f77eb9; /* Pink button background */
+        color: #1e1e1e; /* Dark text on button */
+    }
+
+    ul li {
+        border-color: #f77eb9; /* Pink border for messages */
+        background-color: #552c55; /* Dark purple for messages */
+        color: #f77eb9; /* Light pink text for messages */
+    }
+
+    a {
+        color: #d1aaff; /* Light Purple link color */
+    }
+
+    footer {
+        color: #777;
+    }
+}

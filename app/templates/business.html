@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ company.name }} - Business Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/business.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body>
+
+    <main class="container">
+        <nav>
+            <ul>
+                <li><strong>Business Page</strong></li>
+            </ul>
+        </nav>
+
+        <h1>{{ company.name }}</h1>
+        <p>Location: {{ company.city }}, {{ company.country }}</p>
+
+        <!-- Review Form -->
+        <form method="POST">
+            <label for="rating">Rate this business:</label>
+            <select name="rating" id="rating" required>
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+            <button type="submit">Submit Review</button>
+        </form>
+
+        <!-- Option to contact support via WhatsApp for ratings 1-3 -->
+        {% if show_support %}
+        <p>We're sorry you had a negative experience. Please reach out to us via WhatsApp for assistance:</p>
+        <a href="https://wa.me/1234567890" target="_blank">Contact Support on WhatsApp</a>
+        {% endif %}
+
+        <!-- Option for feedback link for ratings 4-5 -->
+        {% if show_feedback_link %}
+        <p>Thank you for your positive review! We'd love to hear more from you. <a href="https://example.com/feedback"
+                target="_blank">Give more feedback</a></p>
+        {% endif %}
+
+        <footer style="margin-top: 3rem; text-align: center;">
+            <small>&copy; 2025 MySite. All rights reserved.</small>
+        </footer>
+    </main>
+
+
+</body>
+
+</html>

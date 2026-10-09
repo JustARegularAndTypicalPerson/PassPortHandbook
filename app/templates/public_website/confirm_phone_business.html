@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Confirm Phone</title>
+    <script src="../../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../../static/css/public_website/confirm_phone_business.css" />
+
+</head>
+
+<body>
+
+    <div class="content">
+        <div class="logo-padding">
+            <logo-on-page></logo-on-page>
+        </div>
+
+    </style>
+    <h1>Код подтверждения</h1>
+    <h2>Код отправлен на номер</h2>
+    
+    <div class="code-input">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+    </div>
+    
+    <div class="timer">
+        Запросить код через:  <span id="timer">60</span>
+    </div>
+    <!-- <button class="resend-button">Запросить повторно</button> -->
+
+    <!-- <script>
+        let timeLeft = 60;
+        const timerElement = document.getElementById('timer');
+        const resendButton = document.querySelector('.resend-button');
+        
+        const countdown = setInterval(() => {
+            timerElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.textContent = '0';
+                resendButton.style.display = 'block';
+            }
+            
+            timeLeft--;
+        }, 1000);
+    </script> -->
+
+
+    </div>
+
+    <footer-on-page></footer-on-page>
+
+
+
+
+
+
+
+
+
+</body>

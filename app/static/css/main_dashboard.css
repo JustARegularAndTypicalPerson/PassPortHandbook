@@ -1,0 +1,107 @@
+body {
+    font-family: system-ui, sans-serif;
+    background: #f6f8fa;
+    margin: 0;
+}
+
+div.отступ-лого {
+    padding-left: 200px;
+}
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    padding: 32px 24px;
+}
+
+h1 {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.75px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #292949;
+}
+
+h2 {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: -0.75px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #292949;
+}
+
+.date {
+    color: #888;
+    margin-bottom: 24px;
+}
+
+.section {
+    margin-bottom: 32px;
+}
+
+ul {
+    margin: 0 0 0 18px;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+code {
+    background: #f3f6fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.cmd-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.cmd-table th,
+.cmd-table td {
+    border: 1px solid #e3e7ee;
+    padding: 6px 10px;
+}
+
+.cmd-table th {
+    background: #f3f6fa;
+}
+
+button {
+    padding: 8px 16px;
+    background: #f6b3d3;
+    color: #ffffff;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    border: none;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    letter-spacing: -1;
+    font-weight: semibold;
+}
+
+
+button:hover {
+    border: 2px;
+    border-color: #292949;
+
+
+}

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Job Monitor</title>
+    <script src="../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../../static/css/jobs.css">
+
+
+</head>
+<body>
+
+
+    <div class="отступ-лого">
+        <logo-on-page></logo-on-page>
+    </div>
+
+
+    <div class="container">
+        <h1>Scraping Job Monitor</h1>
+        <div class="controls">
+            <button id="refreshButton">Refresh</button>
+            <button id="clearButton" type="button">Clear</button>
+            <label title="Auto-refresh every 5 seconds"><input type="checkbox" id="autoRefresh"> Auto-refresh</label>
+        </div>
+        <div class="table-responsive">
+        <table id="jobsTable" aria-label="Scraping Jobs Table">
+            <thead>
+                <tr>
+                    <th data-sort="job_id">Job ID</th>
+                    <th data-sort="status">Status</th>
+                    <th data-sort="scraper">Scraper</th>
+                    <th data-sort="operation_type">Operation Type</th>
+                    <th data-sort="target_id">Target ID</th>
+                    <th data-sort="period">Period</th>
+                    <th data-sort="page_num">Page Num</th>
+                    <th data-sort="worker_id">Worker ID</th>
+                    <th data-sort="enqueued_at">Enqueued At</th>
+                    <th data-sort="started_at">Started At</th>
+                    <th data-sort="completed_at">Completed At</th>
+                    <th>Result</th>
+                    <th>Error Message</th>
+                    <th>Cancel</th>
+                </tr>
+            </thead>
+            <tbody id="jobTableBody">
+                <!-- Job rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+    <script>
+        function fetchWithAdminToken(url, options = {}) {
+            const token = localStorage.getItem('adminToken');
+            options.headers = options.headers || {};
+            if (token) {
+                options.headers['X-Admin-Token'] = token;
+            }
+            return fetch(url, options);
+        }
+
+        let jobsData = [];
+        let currentSort = { key: 'enqueued_at', asc: false };
+        let autoRefreshInterval = null;
+        let currentPage = 1;
+        let rowsPerPage = 15;
+        let totalJobs = 0;
+        let totalPages = 1;
+
+        function getJobsEndpoint() {
+            const url = new URL('/api/jobs/status', window.location.origin);
+            url.searchParams.set('count', rowsPerPage);
+            url.searchParams.set('page', currentPage);
+            return url.pathname + url.search;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const jobTableBody = document.getElementById('jobTableBody');
+            const refreshButton = document.getElementById('refreshButton');
+            const clearButton = document.getElementById('clearButton');
+            const autoRefresh = document.getElementById('autoRefresh');
+            const jobsTable = document.getElementById('jobsTable');
+
+            async function fetchJobs() {
+                jobTableBody.innerHTML = '<tr><td colspan="14" style="text-align: center;">Loading jobs...</td></tr>';
+                try {
+                    const response = await fetchWithAdminToken(getJobsEndpoint());
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    jobsData = data.jobs;
+                    totalJobs = data.total || jobsData.length;
+                    totalPages = Math.max(1, Math.ceil(totalJobs / rowsPerPage));
+                    renderJobs();
+                    renderPagination(currentPage, totalPages);
+                } catch (error) {
+                    console.error('Error fetching jobs:', error);
+                    jobTableBody.innerHTML = `<tr><td colspan="14" style="text-align: center; color: red;">Failed to load jobs: ${error.message}</td></tr>`;
+                }
+            }
+
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text);
+            }
+
+            function canCancelJob(job) {
+                return !['completed', 'failed', 'cancelled'].includes((job.status || '').toLowerCase());
+            }
+
+            async function cancelJob(jobId) {
+                if (!confirm('Are you sure you want to cancel this job?')) return;
+                try {
+                    const resp = await fetchWithAdminToken(`/api/jobs/${jobId}/cancel`, { method: 'POST' });
+                    if (!resp.ok) {
+                        const data = await resp.json();
+                        alert(data.message || 'Failed to cancel job.');
+                    }
+                    await fetchJobs();
+                } catch (e) {
+                    alert('Failed to cancel job.');
+                }
+            }
+
+            function renderJobs() {
+                jobTableBody.innerHTML = '';
+                if (!jobsData || jobsData.length === 0) {
+                    jobTableBody.innerHTML = '<tr><td colspan="14" style="text-align: center;">No jobs found.</td></tr>';
+                    renderPagination(1, 1);
+                    return;
+                }
+                // Remove frontend-side pagination: just render jobsData as is
+                jobsData.forEach(job => {
+                    const row = jobTableBody.insertRow();
+                    const statusClass = `status-${(job.status || 'unknown').replace(' ', '_').toLowerCase()}`;
+                    // Helper for cell with copy button and tooltip
+                    function cellWithTruncate(val, ariaLabel='') {
+                        if (!val) return '';
+                        const str = String(val);
+                        const truncated = str.length > 32 ? str.slice(0, 32) + '…' : str;
+                        return `<div style="position:relative;display:flex;align-items:center;gap:4px;">
+                            <span class='truncate' title="${str}">${truncated}</span>
+                            <button class='copy-btn' title='Copy' aria-label='Copy' onclick='navigator.clipboard.writeText(` + JSON.stringify(str) + `)'>📋</button>
+                        </div>`;
+                    }
+                    // Job ID with copy
+                    let jidCell = row.insertCell();
+                    jidCell.innerHTML = cellWithTruncate(job.job_id, 'Job ID');
+                    jidCell.setAttribute('data-col', 'job_id');
+                    // Status cell
+                    let cell = row.insertCell();
+                    cell.className = 'no-wrap';
+                    cell.innerHTML = `<span class="${statusClass}">${(job.status || 'unknown').toUpperCase()}</span>`;
+                    cell.setAttribute('data-col', 'status');
+                    // Scraper cell
+                    cell = row.insertCell();
+                    cell.className = 'no-wrap';
+                    cell.innerHTML = cellWithTruncate(job.scraper_type, 'Scraper');
+                    cell.setAttribute('data-col', 'scraper');
+                    // Operation Type cell
+                    cell = row.insertCell();
+                    cell.className = 'no-wrap';
+                    cell.innerHTML = cellWithTruncate(job.operation_type, 'Operation Type');
+                    cell.setAttribute('data-col', 'operation_type');
+                    let tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.target_id, 'Target ID');
+                    tcell.setAttribute('data-col', 'target_id');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.period, 'Period');
+                    tcell.setAttribute('data-col', 'period');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.page_num, 'Page Num');
+                    tcell.setAttribute('data-col', 'page_num');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.worker_id, 'Worker ID');
+                    tcell.setAttribute('data-col', 'worker_id');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.enqueued_at, 'Enqueued At');
+                    tcell.setAttribute('data-col', 'enqueued_at');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.started_at, 'Started At');
+                    tcell.setAttribute('data-col', 'started_at');
+                    tcell = row.insertCell();
+                    tcell.innerHTML = cellWithTruncate(job.completed_at, 'Completed At');
+                    tcell.setAttribute('data-col', 'completed_at');
+                    // Result cell
+                    const resultCell = row.insertCell();
+                    resultCell.setAttribute('data-col', 'result');
+                    if (job.result_url) {
+                        resultCell.innerHTML = `<a href="${job.result_url}" target="_blank">View</a>`;
+                    } else if (job.result_data) {
+                        resultCell.innerHTML = cellWithTruncate(job.result_data, 'Result Data');
+                    } else {
+                        resultCell.textContent = 'N/A';
+                    }
+                    // Error message
+                    let errCell = row.insertCell();
+                    errCell.innerHTML = cellWithTruncate(job.error_message, 'Error Message');
+                    errCell.setAttribute('data-col', 'error_message');
+                    // Cancel button
+                    const cancelCell = row.insertCell();
+                    cancelCell.setAttribute('data-col', 'cancel');
+                    if (canCancelJob(job)) {
+                        cancelCell.innerHTML = `<button class="cancel-btn" data-job-id="${job.job_id}">Cancel</button>`;
+                    } else {
+                        cancelCell.innerHTML = '';
+                    }
+                });
+                renderPagination(currentPage, totalPages);
+            }
+            function renderPagination(current, total) {
+                const pag = document.getElementById('pagination');
+                pag.innerHTML = '';
+                // Rows per page selector
+                const select = document.createElement('select');
+                [10, 15, 25, 50, 100].forEach(opt => {
+                    const o = document.createElement('option');
+                    o.value = opt;
+                    o.textContent = opt + ' rows';
+                    if (opt === rowsPerPage) o.selected = true;
+                    select.appendChild(o);
+                });
+                select.onchange = function() {
+                    rowsPerPage = parseInt(this.value);
+                    currentPage = 1;
+                    fetchJobs();
+                };
+                pag.appendChild(select);
+                // Prev button
+                const prev = document.createElement('button');
+                prev.textContent = 'Prev';
+                prev.disabled = current <= 1;
+                prev.onclick = function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        fetchJobs();
+                    }
+                };
+                pag.appendChild(prev);
+                // Page numbers
+                for (let i = 1; i <= total; i++) {
+                    if (i === 1 || i === total || Math.abs(i - current) <= 2) {
+                        const btn = document.createElement('button');
+                        btn.textContent = i;
+                        btn.className = (i === current) ? 'active' : '';
+                        btn.onclick = function() {
+                            currentPage = i;
+                            fetchJobs();
+                        };
+                        pag.appendChild(btn);
+                    } else if (i === current - 3 || i === current + 3) {
+                        const dots = document.createElement('span');
+                        dots.textContent = '...';
+                        pag.appendChild(dots);
+                    }
+                }
+                // Next button
+                const next = document.createElement('button');
+                next.textContent = 'Next';
+                next.disabled = current >= total;
+                next.onclick = function() {
+                    if (currentPage < total) {
+                        currentPage++;
+                        fetchJobs();
+                    }
+                };
+                pag.appendChild(next);
+                // Info
+                const info = document.createElement('span');
+                info.style.marginLeft = '12px';
+                info.textContent = `Page ${current} of ${total} (${totalJobs} jobs)`;
+                pag.appendChild(info);
+            }
+
+            jobsTable.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const key = th.getAttribute('data-sort');
+                    if (currentSort.key === key) {
+                        currentSort.asc = !currentSort.asc;
+                    } else {
+                        currentSort.key = key;
+                        currentSort.asc = false;
+                    }
+                    renderJobs();
+                });
+            });
+
+            jobTableBody.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.classList.contains('cancel-btn')) {
+                    const jobId = target.getAttribute('data-job-id');
+                    if (jobId) {
+                        cancelJob(jobId);
+                    }
+                }
+            });
+
+            refreshButton.addEventListener('click', fetchJobs);
+            clearButton.addEventListener('click', async () => {
+                if (!confirm('Are you sure you want to clear ALL jobs and queues? This action cannot be undone.')) {
+                    return;
+                }
+                try {
+                    const response = await fetchWithAdminToken('/api/jobs/clear', { method: 'POST' });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Failed to clear jobs.');
+                    }
+                    alert('All jobs have been cleared.');
+                    await fetchJobs(); // Refresh the view to show it's empty
+                } catch (error) {
+                    console.error('Error clearing jobs:', error);
+                    alert(`Failed to clear jobs: ${error.message}`);
+                }
+            });
+            autoRefresh.addEventListener('change', () => {
+                if (autoRefresh.checked) {
+                    autoRefreshInterval = setInterval(fetchJobs, 5000);
+                } else {
+                    clearInterval(autoRefreshInterval);
+                }
+            });
+            fetchJobs();
+
+            // --- Floating Tooltip Portal ---
+            const tooltip = document.createElement('div');
+            tooltip.className = 'floating-tooltip';
+            document.body.appendChild(tooltip);
+            let tooltipTimeout = null;
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target.closest('.truncate');
+                if (target && target.textContent !== target.title && target.title) {
+                    tooltip.textContent = target.title;
+                    const rect = target.getBoundingClientRect();
+                    tooltip.style.left = (rect.left + window.scrollX) + 'px';
+                    tooltip.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
+                    clearTimeout(tooltipTimeout);
+                }
+            });
+            document.addEventListener('mousemove', function(e) {
+                if (tooltip.style.visibility === 'visible') {
+                    const target = e.target.closest('.truncate');
+                    if (target && target.title) {
+                        const rect = target.getBoundingClientRect();
+                        tooltip.style.left = (rect.left + window.scrollX) + 'px';
+                        tooltip.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                    }
+                }
+            });
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.classList && e.target.classList.contains('truncate')) {
+                    tooltipTimeout = setTimeout(() => {
+                        tooltip.style.visibility = 'hidden';
+                        tooltip.style.opacity = '0';
+                    }, 80);
+                }
+            });
+            // Set th data-col attributes for less important columns
+            const ths = jobsTable.querySelectorAll('th');
+            const thCols = ['job_id','status','scraper','operation_type','target_id','period','page_num','worker_id','enqueued_at','started_at','completed_at','result','error_message','cancel'];
+            ths.forEach((th, i) => {
+                th.setAttribute('data-col', thCols[i]);
+            });
+        });
+    </script>
+</body>
+</html>

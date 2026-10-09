@@ -1,0 +1,268 @@
+h1 {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.75px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #292949;
+}
+h1 {
+    font-size: 2.1rem;
+    font-weight: 600;
+    margin-bottom: 28px;
+    letter-spacing: 0.01em;
+}
+div.отступ-лого {
+    padding-left: 200px;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: #f6f8fa;
+    color: #222;
+}
+
+.container {
+    background: #fff;
+    margin: 32px auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+    max-width: 100%;
+    width: 100%;
+    padding: 32px 0 24px 0;
+}
+
+
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.controls button,
+.controls label {
+    padding: 8px 16px;
+    background: #f6b3d3;
+    color: rgb(0, 0, 0);
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    letter-spacing: -1;
+    font-weight: semibold;
+    border: 3px solid black;
+    border-color: #1742a600;
+
+}
+
+div.controls {
+    width: 100%;
+    height: 50px;
+}
+.controls button:hover,
+.controls label:hover {
+
+    border-color: #b9879f7e;
+
+}
+
+.controls input[type="checkbox"] {
+    margin-left: 8px;
+    margin-right: 2px;
+}
+
+.table-responsive {
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    min-width: 1200px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 18px;
+    background: #fff;
+}
+
+thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f3f6fa;
+    font-weight: 600;
+    color: #3f3f3f;
+    border-bottom: 2px solid #e3e7ee;
+    white-space: nowrap;
+    height: 48px;
+}
+
+th,
+td {
+    border-bottom: 1px solid #e3e7ee;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: middle;
+    background: #fff;
+    height: 44px;
+}
+
+th[data-col='enqueued_at'],
+th[data-col='started_at'],
+th[data-col='completed_at'],
+th[data-col='worker_id'],
+th[data-col='page_num'],
+th[data-col='period'] {
+    max-width: 120px;
+    width: 120px;
+    min-width: 80px;
+    font-size: 0.95em;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+td[data-col='enqueued_at'],
+td[data-col='started_at'],
+td[data-col='completed_at'],
+td[data-col='worker_id'],
+td[data-col='page_num'],
+td[data-col='period'] {
+    max-width: 120px;
+    width: 120px;
+    min-width: 80px;
+    font-size: 0.95em;
+    color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Remove .tooltip absolute positioning, as it will be handled by JS portal */
+.floating-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-width: 220px;
+    max-width: 600px;
+    background: #222;
+    color: #fff;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 0.98em;
+    z-index: 9999;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+    transition: opacity 0.18s;
+    word-break: break-all;
+    pointer-events: none;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    color: #f6b3d3;
+    cursor: pointer;
+    font-size: 1em;
+    margin-left: 4px;
+}
+
+.copy-btn:focus {
+    outline: 2px solid #1741a6;
+}
+
+.cancel-btn {
+    background: #f6b3d3;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 10px;
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 0.95em;
+    white-space: nowrap;
+}
+
+.cancel-btn:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+.status-pending {
+    color: #ffc107;
+}
+
+.status-in_progress,
+.status-running {
+    color: #17a2b8;
+}
+
+.status-completed {
+    color: #28a745;
+}
+
+.status-failed {
+    color: #dc3545;
+}
+
+.status-unknown {
+    color: #6c757d;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    justify-content: flex-end;
+}
+
+.pagination button {
+    background: #f3f6fa;
+    color: #1a4b7a;
+    border: 1px solid #e3e7ee;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.pagination button.active,
+.pagination button:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.pagination select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e3e7ee;
+    font-size: 1em;
+}
+
+@media (max-width: 900px) {
+
+    table,
+    th,
+    td {
+        font-size: 0.92em;
+    }
+
+    .container {
+        padding: 8px;
+    }
+}

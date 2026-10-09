@@ -1,0 +1,112 @@
+div.auth-container {
+    box-sizing: border-box;
+    margin-top: 300px;
+    width: 80%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 15px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+    background-color: #ffffff;
+    border-radius: 8px;
+
+}
+
+div.отступ-лого {
+    padding-left: 200px;
+}
+
+h2 {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.75px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #292949;
+
+}
+
+h1.auth {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 20px;
+    line-height: 100%;
+    letter-spacing: -0.75px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #292949;
+
+}
+
+.строка {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#верхняя-половинка {
+    border-radius: 30px 30px 0px 0px;
+    width: 416px;
+    height: 50px;
+    background-color: #f2f2f2;
+}
+
+#нижняя-половинка {
+    border-radius: 0px 0px 30px 30px;
+    background-color: #f6b3d3;
+    width: 416px;
+    height: 50px;
+}
+
+.ввод-контейнер {
+    position: relative;
+    display: inline-block;
+}
+
+.ввод-контейнер::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-image: none;
+    background-size: contain;
+}
+
+
+
+input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding-left: 35px;
+    padding-top: 17px;
+    font-size: 16px;
+}
+
+input::placeholder {
+    color: #8f8f8f;
+    font-family: system-ui, sans-serif;
+}
+
+button {
+    border: none;
+    background-color: transparent;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    color: #292949;
+    letter-spacing: -1;
+    font-weight: semibold;
+}

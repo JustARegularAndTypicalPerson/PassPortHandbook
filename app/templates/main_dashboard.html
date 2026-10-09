@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главный экран мониторинга</title>
+    <script src="../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../static/css/main_dashboard.css">
+</head>
+<body>
+
+
+    
+<div class="отступ-лого">
+    <logo-on-page></logo-on-page>
+</div>
+
+<div class="container">
+    <h1>Главный экран мониторинга</h1>
+    <div class="date">Сегодня: {{ today }}</div>
+
+    <div class="section">
+        <h2>Мониторы</h2>
+        <ul>
+            <li><a href="/api/jobs/monitor">Монитор заданий (Jobs Monitor)</a></li>
+            <li><a href="/api/logs/monitor">Монитор логов (Logs Monitor)</a></li>
+            <li><a href="/api/workers/manage">Управление воркерами (Forbidden Workers)</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Команды для скрапинга</h2>
+        <table class="cmd-table">
+            <tr><th>Команда</th><th>Описание</th></tr>
+            <tr><td><code>POST /scrapers/add-job/&lt;scraper_type&gt;/&lt;operation_type&gt;</code></td><td>Добавить задание на скрапинг (JSON body, параметры задания)</td></tr>
+            <tr><td><code>GET /jobs/status?count=50&page=1</code></td><td>Получить статусы заданий (с пагинацией)</td></tr>
+            <tr><td><code>GET /jobs/&lt;job_id&gt;/result</code></td><td>Получить результат задания</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Команды для сервера</h2>
+        <table class="cmd-table">
+            <tr><th>Команда</th><th>Описание</th></tr>
+            <tr><td><code>GET /health</code></td><td>Проверка состояния сервера и Redis</td></tr>
+            <tr><td><code>POST /jobs/clear</code></td><td>Очистить все задания (требует админ-токен)</td></tr>
+            <tr><td><code>POST /logs/clear?type=worker</code></td><td>Очистить логи (требует админ-токен)</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Команды для воркера</h2>
+        <table class="cmd-table">
+            <tr><th>Команда</th><th>Описание</th></tr>
+            <tr><td><code>GET /workers/all</code></td><td>Получить всех воркеров, статус и мета</td></tr>
+            <tr><td><code>POST /workers/&lt;worker_id&gt;/meta</code></td><td>Изменить label воркера</td></tr>
+            <tr><td><code>POST /workers/forbidden/&lt;worker_id&gt;</code></td><td>Запретить воркера</td></tr>
+            <tr><td><code>DELETE /workers/forbidden/&lt;worker_id&gt;</code></td><td>Разрешить воркера</td></tr>
+            <tr><td><code>POST /queues</code></td><td>Добавить новую очередь (JSON: {"name": "queue_name"})</td></tr>
+            <tr><td><code>DELETE /queues/&lt;queue_name&gt;</code></td><td>Удалить очередь</td></tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Управление воркерами и очередями</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+            <a href="/api/workers/manage"><button>Открыть управление воркерами</button></a>
+            <button onclick="showAddQueueDialog()">Добавить очередь</button>
+            <button onclick="showRemoveQueueDialog()">Удалить очередь</button>
+            <button onclick="window.location='/api/workers/all'">Список всех воркеров (JSON)</button>
+        </div>
+        <div id="queueDialog" style="display:none; background:#f3f6fa; border:1px solid #e3e7ee; border-radius:8px; padding:18px; margin-bottom:18px; max-width:400px;">
+            <form id="queueForm">
+                <label id="queueDialogLabel"></label><br>
+                <input type="text" id="queueNameInput" placeholder="Имя очереди" required style="margin:8px 0; padding:6px; width:90%;">
+                <button type="submit">OK</button>
+                <button type="button" onclick="hideQueueDialog()">Отмена</button>
+            </form>
+            <div id="queueMsg" style="color:#28a745; margin-top:8px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAddQueueDialog() {
+    document.getElementById('queueDialogLabel').textContent = 'Добавить очередь';
+    document.getElementById('queueForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('queueNameInput').value.trim();
+        if (!name) return;
+        const resp = await fetch('/api/queues', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Token': localStorage.getItem('adminToken')||'' },
+            body: JSON.stringify({ name })
+        });
+        const data = await resp.json();
+        document.getElementById('queueMsg').textContent = data.message || data.error || '';
+        if (resp.ok) setTimeout(hideQueueDialog, 1200);
+    };
+    document.getElementById('queueNameInput').value = '';
+    document.getElementById('queueMsg').textContent = '';
+    document.getElementById('queueDialog').style.display = '';
+}
+function showRemoveQueueDialog() {
+    document.getElementById('queueDialogLabel').textContent = 'Удалить очередь';
+    document.getElementById('queueForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('queueNameInput').value.trim();
+        if (!name) return;
+        const resp = await fetch('/api/queues/' + encodeURIComponent(name), {
+            method: 'DELETE',
+            headers: { 'X-Admin-Token': localStorage.getItem('adminToken')||'' }
+        });
+        const data = await resp.json();
+        document.getElementById('queueMsg').textContent = data.message || data.error || '';
+        if (resp.ok) setTimeout(hideQueueDialog, 1200);
+    };
+    document.getElementById('queueNameInput').value = '';
+    document.getElementById('queueMsg').textContent = '';
+    document.getElementById('queueDialog').style.display = '';
+}
+function hideQueueDialog() {
+    document.getElementById('queueDialog').style.display = 'none';
+}
+</script>
+</body>
+</html>

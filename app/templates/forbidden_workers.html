@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Management</title>
+    <script src="../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../../static/css/forbidden_workers.css">
+
+</head>
+<body>
+
+
+<div class="отступ-лого">
+    <logo-on-page></logo-on-page>
+</div>
+
+
+<div class="container">
+    <h1>Worker Management</h1>
+    <div id="msg" class="msg" style="display:none;"></div>
+    <table aria-label="Workers Table">
+        <thead>
+            <tr>
+                <th data-sort="id">Worker ID</th>
+                <th data-sort="label">Label</th>
+                <th>Forbidden From</th>
+                <th data-sort="forbidden">Global Forbidden</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="workersTableBody">
+            <!-- Rows inserted by JS -->
+        </tbody>
+    </table>
+</div>
+<script>
+// Helper: fetch with admin token from localStorage
+function fetchWithAdminToken(url, options = {}) {
+    const token = localStorage.getItem('adminToken');
+    options.headers = options.headers || {};
+    if (token) {
+        options.headers['X-Admin-Token'] = token;
+    }
+    return fetch(url, options);
+}
+
+let workersData = {};
+let currentSort = { key: 'id', asc: true };
+
+async function fetchWorkers() {
+    const resp = await fetchWithAdminToken('/api/workers/all');
+    workersData = await resp.json();
+    renderWorkers();
+}
+
+function renderWorkers() {
+    const tbody = document.getElementById('workersTableBody');
+    tbody.innerHTML = '';
+    const data = workersData;
+    // If no workers, show a message
+    if (!data.workers || data.workers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No registered workers found.</td></tr>';
+        return;
+    }
+
+    const sortedWorkers = [...(data.workers || [])].sort((a, b) => {
+        let valA = a[currentSort.key];
+        let valB = b[currentSort.key];
+
+        if (typeof valA === 'boolean') {
+            valA = valA ? 1 : 0;
+            valB = valB ? 1 : 0;
+        } else {
+            valA = String(valA || '').toLowerCase();
+            valB = String(valB || '').toLowerCase();
+        }
+
+        if (valA < valB) return currentSort.asc ? -1 : 1;
+        if (valA > valB) return currentSort.asc ? 1 : -1;
+        return 0;
+    });
+
+    sortedWorkers.forEach(worker => {
+        const label = worker.label || '';
+        const allQueues = data.all_queues || [];
+        const forbiddenQueues = worker.forbidden_queues || [];
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${worker.id}</td>
+            <td>
+                <input class="label-input" type="text" value="${label}" placeholder="No label" />
+            </td>
+            <td>
+                ${allQueues.length > 0 ? allQueues.map(q => `
+                    <label>
+                        <input type="checkbox" class="queue-forbid-toggle" data-queue="${q}" data-id="${worker.id}" title="Forbid from queue ${q}"${forbiddenQueues.includes(q) ? ' checked' : ''}>
+                        <span>${q}</span>
+                    </label>
+                `).join('') : 'No queues defined.'}
+            </td>
+            <td><input type="checkbox" class="forbid-toggle" data-id="${worker.id}"${worker.forbidden ? ' checked' : ''} title="Forbid worker globally"></td>
+            <td><button class="save-btn" data-id="${worker.id}">Save</button></td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Table header sorting
+document.querySelector('table thead').addEventListener('click', e => {
+    const th = e.target.closest('th');
+    if (th && th.dataset.sort) {
+        const key = th.dataset.sort;
+        if (currentSort.key === key) {
+            currentSort.asc = !currentSort.asc;
+        } else {
+            currentSort.key = key;
+            currentSort.asc = true;
+        }
+        renderWorkers();
+    }
+});
+
+// Table actions
+document.getElementById('workersTableBody').addEventListener('click', async e => {
+    const id = e.target.getAttribute('data-id');
+    if (e.target.classList.contains('save-btn')) {
+        const row = e.target.closest('tr');
+        const label = row.querySelector('.label-input').value;
+        const resp = await fetchWithAdminToken(`/api/workers/${encodeURIComponent(id)}/meta`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ label })
+        });
+        const data = await resp.json();
+        showMsg(data.message || 'Worker metadata updated.');
+        await fetchWorkers();
+    }
+});
+
+document.getElementById('workersTableBody').addEventListener('change', async e => {
+    if (e.target.classList.contains('forbid-toggle')) {
+        const id = e.target.getAttribute('data-id');
+        const forbidden = e.target.checked;
+        const resp = await fetchWithAdminToken(`/api/workers/forbidden/${encodeURIComponent(id)}`, {
+            method: forbidden ? 'POST' : 'DELETE'
+        });
+        const data = await resp.json();
+        showMsg(data.message || (forbidden ? 'Worker forbidden.' : 'Worker unforbidden.'));
+        await fetchWorkers();
+    } else if (e.target.classList.contains('queue-forbid-toggle')) {
+        // Per-queue forbid/unforbid
+        const id = e.target.getAttribute('data-id');
+        const queue = e.target.getAttribute('data-queue');
+        const forbidden = e.target.checked;
+        const url = `/api/queues/${encodeURIComponent(queue)}/forbidden/${encodeURIComponent(id)}`;
+        const resp = await fetchWithAdminToken(url, { method: forbidden ? 'POST' : 'DELETE' });
+        const data = await resp.json();
+        showMsg(data.message || (forbidden ? `Worker forbidden from ${queue}` : `Worker unforbidden for ${queue}`));
+        await fetchWorkers();
+    }
+});
+
+function showMsg(msg) {
+    const el = document.getElementById('msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 2000);
+}
+
+fetchWorkers();
+</script>
+</body>
+</html>

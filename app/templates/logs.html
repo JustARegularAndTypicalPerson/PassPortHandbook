@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Log Monitor</title>
+    <script src="../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../../static/css/logs.css">
+
+
+
+</head>
+<body>
+
+
+    <div class="отступ-лого">
+        <logo-on-page></logo-on-page>
+    </div>
+
+
+
+    <div class="container">
+        <h1>Application Log Monitor</h1>
+        <div class="controls">
+            <button id="refreshButton">Refresh</button>
+            <button id="clearButton" type="button">Clear Logs</button>
+            <label title="Auto-refresh every 5 seconds"><input type="checkbox" id="autoRefresh"> Auto-refresh</label>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <!-- <div id="logTabs" style="display: flex; gap: 8px;">
+                <button class="tab-btn active" data-logtype="worker">Worker</button>
+                <button class="tab-btn" data-logtype="app">App</button>
+                <button class="tab-btn" data-logtype="auth">Auth</button>
+                <button class="tab-btn" data-logtype="api">API</button>
+            </div> -->
+        </div>
+        <div class="table-responsive">
+        <table id="logsTable" aria-label="Logs Table">
+            <thead>
+                <tr id="logsTableHeader">
+                    <!-- Table headers will be set by JS -->
+                </tr>
+            </thead>
+            <tbody id="logTableBody">
+                <!-- Log rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+    <script>
+        const LOG_TYPES = {
+            worker: {
+                endpoint: '/api/logs',
+                columns: [
+                    { key: 'id', label: 'Log ID', sortable: true },
+                    { key: 'timestamp', label: 'Timestamp', sortable: true },
+                    { key: 'level', label: 'Level', sortable: true },
+                    { key: 'worker_id', label: 'Worker ID', sortable: true },
+                    { key: 'job_id', label: 'Job ID', sortable: true },
+                    { key: 'message', label: 'Message', sortable: false },
+                ]
+            },
+            app: {
+                endpoint: '/api/logs?type=app',
+                columns: [
+                    { key: 'id', label: 'Log ID', sortable: true },
+                    { key: 'timestamp', label: 'Timestamp', sortable: true },
+                    { key: 'level', label: 'Level', sortable: true },
+                    { key: 'module', label: 'Module', sortable: true },
+                    { key: 'message', label: 'Message', sortable: false },
+                ]
+            },
+            auth: {
+                endpoint: '/api/logs?type=auth',
+                columns: [
+                    { key: 'id', label: 'Log ID', sortable: true },
+                    { key: 'timestamp', label: 'Timestamp', sortable: true },
+                    { key: 'level', label: 'Level', sortable: true },
+                    { key: 'user_id', label: 'User ID', sortable: true },
+                    { key: 'action', label: 'Action', sortable: true },
+                    { key: 'message', label: 'Message', sortable: false },
+                ]
+            },
+            api: {
+                endpoint: '/api/logs?type=api',
+                columns: [
+                    { key: 'id', label: 'Log ID', sortable: true },
+                    { key: 'timestamp', label: 'Timestamp', sortable: true },
+                    { key: 'level', label: 'Level', sortable: true },
+                    { key: 'endpoint', label: 'Endpoint', sortable: true },
+                    { key: 'user_id', label: 'User ID', sortable: true },
+                    { key: 'message', label: 'Message', sortable: false },
+                ]
+            },
+        };
+        let logsData = [];
+        let currentSort = { key: 'id', asc: false };
+        let autoRefreshInterval = null;
+        let currentLogType = 'worker';
+        let currentPage = 1;
+        let rowsPerPage = 50;
+        let totalLogs = 0;
+        let totalPages = 1;
+        function fetchWithAdminToken(url, options = {}) {
+            const token = localStorage.getItem('adminToken');
+            options.headers = options.headers || {};
+            if (token) {
+                options.headers['X-Admin-Token'] = token;
+            }
+            return fetch(url, options);
+        }
+        function getEndpoint() {
+            let base = LOG_TYPES[currentLogType].endpoint;
+            const url = new URL(base, window.location.origin);
+            url.searchParams.set('count', rowsPerPage);
+            url.searchParams.set('page', currentPage);
+            return url.pathname + url.search;
+        }
+        async function fetchLogs() {
+            const logTableBody = document.getElementById('logTableBody');
+            logTableBody.innerHTML = `<tr><td colspan="${LOG_TYPES[currentLogType].columns.length}" style="text-align: center;">Loading logs...</td></tr>`;
+            try {
+                const response = await fetch(getEndpoint());
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                logsData = data.logs;
+                totalLogs = data.total || logsData.length;
+                totalPages = Math.max(1, Math.ceil(totalLogs / rowsPerPage));
+                renderLogs();
+                renderPagination();
+            } catch (error) {
+                logTableBody.innerHTML = `<tr><td colspan="${LOG_TYPES[currentLogType].columns.length}" style="text-align: center; color: red;">Failed to load logs: ${error.message}</td></tr>`;
+            }
+        }
+        function cellWithTruncate(val, ariaLabel='') {
+            if (!val) return '';
+            const str = String(val);
+            const truncated = str.length > 48 ? str.slice(0, 48) + '…' : str;
+            // Remove .tooltip from here, only .truncate span and copy button
+            return `<div style="position:relative;display:flex;align-items:center;gap:4px;">
+                <span class='truncate' title="${str}">${truncated}</span>
+                <button class='copy-btn' title='Copy' aria-label='Copy' onclick='navigator.clipboard.writeText(` + JSON.stringify(str) + `)'>📋</button>
+            </div>`;
+        }
+        function renderLogs() {
+            const logTableBody = document.getElementById('logTableBody');
+            logTableBody.innerHTML = '';
+            if (!logsData || logsData.length === 0) {
+                logTableBody.innerHTML = `<tr><td colspan="${LOG_TYPES[currentLogType].columns.length}" style="text-align: center;">No logs found.</td></tr>`;
+                return;
+            }
+            const sorted = [...logsData].sort((a, b) => {
+                let valA = a[currentSort.key] || '';
+                let valB = b[currentSort.key] || '';
+                if (currentSort.key === 'timestamp') {
+                    valA = Date.parse(valA) || 0;
+                    valB = Date.parse(valB) || 0;
+                }
+                if (valA < valB) return currentSort.asc ? -1 : 1;
+                if (valA > valB) return currentSort.asc ? 1 : -1;
+                return 0;
+            });
+            sorted.forEach(log => {
+                const row = logTableBody.insertRow();
+                // Set data-col attributes for less important columns
+                const ths = logsTable.querySelectorAll('th');
+                const thCols = LOG_TYPES[currentLogType].columns.map(col => col.key).concat(['message']);
+                ths.forEach((th, i) => {
+                    th.setAttribute('data-col', thCols[i]);
+                });
+                // When rendering rows, set data-col for less important columns
+                LOG_TYPES[currentLogType].columns.forEach((col, idx) => {
+                    let val = log[col.key];
+                    let cell = row.insertCell();
+                    cell.className = 'truncate';
+                    cell.setAttribute('data-col', col.key);
+                    if (col.key === 'level') {
+                        const levelClass = `log-level-${(val || 'UNKNOWN').toUpperCase()}`;
+                        cell.innerHTML = `<span class="${levelClass}">${(val || 'UNKNOWN').toUpperCase()}</span>`;
+                    } else if (col.key === 'message') {
+                        cell.innerHTML = cellWithTruncate(val, col.label);
+                    } else {
+                        cell.innerHTML = cellWithTruncate(val, col.label);
+                    }
+                });
+            });
+        }
+        function renderPagination() {
+            const pag = document.getElementById('pagination');
+            pag.innerHTML = '';
+            const select = document.createElement('select');
+            [10, 25, 50, 100, 200].forEach(opt => {
+                const o = document.createElement('option');
+                o.value = opt;
+                o.textContent = opt + ' rows';
+                if (opt === rowsPerPage) o.selected = true;
+                select.appendChild(o);
+            });
+            select.onchange = function() {
+                rowsPerPage = parseInt(this.value);
+                currentPage = 1;
+                fetchLogs();
+            };
+            pag.appendChild(select);
+            const prev = document.createElement('button');
+            prev.textContent = 'Prev';
+            prev.disabled = currentPage <= 1;
+            prev.onclick = function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchLogs();
+                }
+            };
+            pag.appendChild(prev);
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+                    const btn = document.createElement('button');
+                    btn.textContent = i;
+                    btn.className = (i === currentPage) ? 'active' : '';
+                    btn.onclick = function() {
+                        currentPage = i;
+                        fetchLogs();
+                    };
+                    pag.appendChild(btn);
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    pag.appendChild(dots);
+                }
+            }
+            const next = document.createElement('button');
+            next.textContent = 'Next';
+            next.disabled = currentPage >= totalPages;
+            next.onclick = function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    fetchLogs();
+                }
+            };
+            pag.appendChild(next);
+            const info = document.createElement('span');
+            info.style.marginLeft = '12px';
+            info.textContent = `Page ${currentPage} of ${totalPages} (${totalLogs} logs)`;
+            pag.appendChild(info);
+        }
+        function setTableHeaders() {
+            const headerRow = document.getElementById('logsTableHeader');
+            headerRow.innerHTML = '';
+            LOG_TYPES[currentLogType].columns.forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col.label;
+                if (col.sortable) {
+                    th.setAttribute('data-sort', col.key);
+                    th.style.cursor = 'pointer';
+                }
+                th.className = 'no-wrap';
+                headerRow.appendChild(th);
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const refreshButton = document.getElementById('refreshButton');
+            const clearButton = document.getElementById('clearButton');
+            const autoRefresh = document.getElementById('autoRefresh');
+            const logsTable = document.getElementById('logsTable');
+            const logTabs = document.getElementById('logTabs');
+            setTableHeaders();
+            fetchLogs();
+            logTabs.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-btn')) {
+                    const logType = e.target.getAttribute('data-logtype');
+                    if (logType !== currentLogType) {
+                        currentLogType = logType;
+                        setTableHeaders();
+                        currentPage = 1;
+                        fetchLogs();
+                    }
+                }
+            });
+            logsTable.addEventListener('click', (e) => {
+                if (e.target.tagName === 'TH' && e.target.hasAttribute('data-sort')) {
+                    const key = e.target.getAttribute('data-sort');
+                    if (currentSort.key === key) {
+                        currentSort.asc = !currentSort.asc;
+                    } else {
+                        currentSort.key = key;
+                        currentSort.asc = false;
+                    }
+                    renderLogs();
+                }
+            });
+            clearButton.addEventListener('click', async () => {
+                if (!confirm('Are you sure you want to clear ALL logs for this tab? This action cannot be undone.')) {
+                    return;
+                }
+                try {
+                    const logType = currentLogType;
+                    let url = '/api/logs/clear';
+                    if (logType !== 'worker') url += `?type=${logType}`;
+                    const response = await fetchWithAdminToken(url, { method: 'POST' });
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Failed to clear logs.');
+                    }
+                    alert('All logs have been cleared.');
+                    await fetchLogs();
+                } catch (error) {
+                    alert(`Failed to clear logs: ${error.message}. You may need to authenticate as admin first.`);
+                }
+            });
+            refreshButton.addEventListener('click', fetchLogs);
+            autoRefresh.addEventListener('change', () => {
+                if (autoRefresh.checked) {
+                    autoRefreshInterval = setInterval(fetchLogs, 5000);
+                } else {
+                    clearInterval(autoRefreshInterval);
+                }
+            });
+            // --- Floating Tooltip Portal ---
+            const tooltip = document.createElement('div');
+            tooltip.className = 'floating-tooltip';
+            document.body.appendChild(tooltip);
+            let tooltipTimeout = null;
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target.closest('.truncate');
+                if (target && target.textContent !== target.title && target.title) {
+                    tooltip.textContent = target.title;
+                    const rect = target.getBoundingClientRect();
+                    tooltip.style.left = (rect.left + window.scrollX) + 'px';
+                    tooltip.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
+                    clearTimeout(tooltipTimeout);
+                }
+            });
+            document.addEventListener('mousemove', function(e) {
+                if (tooltip.style.visibility === 'visible') {
+                    const target = e.target.closest('.truncate');
+                    if (target && target.title) {
+                        const rect = target.getBoundingClientRect();
+                        tooltip.style.left = (rect.left + window.scrollX) + 'px';
+                        tooltip.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                    }
+                }
+            });
+            document.addEventListener('mouseout', function(e) {
+                if (e.target.classList && e.target.classList.contains('truncate')) {
+                    tooltipTimeout = setTimeout(() => {
+                        tooltip.style.visibility = 'hidden';
+                        tooltip.style.opacity = '0';
+                    }, 80);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

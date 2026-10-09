@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Auth</title>
+    <script src="../static/scripts/logo_element.js"></script>
+    <link rel="stylesheet" href="../../static/css/admin_auth.css">
+</head>
+<body>
+
+<div class="отступ-лого">
+    <logo-on-page></logo-on-page>
+</div>
+
+
+
+<div class="auth-container">
+    <div class="строка">
+        <h1 class="auth">Авторизация</h1>
+    </div>
+    <div class="строка">
+        <div id="msg" class="msg"></div>
+        <form id="authForm" autocomplete="off">
+            <div class="строка" id="верхняя-половинка">
+                <label for="adminToken"></label>
+                <div class="ввод-контейнер">
+                    <input type="password" id="adminToken" required placeholder="Токен Администратора">
+                </div>
+            </div>
+            <div class="строка" id="нижняя-половинка">
+                <button type="submit">Войти</button>
+            </div>
+        </form> 
+    </div>
+</div>
+<script>
+// Store token in localStorage for use in API requests
+const form = document.getElementById('authForm');
+const msg = document.getElementById('msg');
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = document.getElementById('adminToken').value.trim();
+    if (!token) {
+        msg.textContent = 'Token required.';
+        msg.style.display = 'block';
+        return;
+    }
+    // Save token for later use
+    localStorage.setItem('adminToken', token);
+    msg.style.color = '#28a745';
+    msg.textContent = 'Authenticated! You can now use admin features.';
+    msg.style.display = 'block';
+    setTimeout(() => {
+        window.location = '/'; // Redirect or close modal as needed
+    }, 1000);
+});
+
+// Helper: fetch with admin token from localStorage
+function fetchWithAdminToken(url, options = {}) {
+    const token = localStorage.getItem('adminToken');
+    options.headers = options.headers || {};
+    if (token) {
+        options.headers['X-Admin-Token'] = token;
+    }
+    return fetch(url, options);
+}
+</script>
+</body>
+</html>

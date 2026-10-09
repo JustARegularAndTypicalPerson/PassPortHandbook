@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+context/
+organizations_files/
+gcp-vscode-ssh/
+.vscode/
+logs/
+*.sqlite
+*.sqlite3
+portfolio.db
+playwright/.cache/
+playwright-report/

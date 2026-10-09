@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Завершите регистрацию</title>
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+<main class="container">
+    <h1>Завершите регистрацию</h1>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <p>Добро пожаловать, <strong>{{ name }} {{ surname }}</strong></p>
+    <p>Ваш телефон: {{ phone }}<br>Ваш email: {{ email }}</p>
+
+    <form action="{{ url_for('yapi_bp.yclients_signup') }}" method="POST">
+        <label for="password">Придумайте пароль</label>
+        <input type="password" id="password" name="password" required minlength="6">
+
+        <button type="submit">Завершить регистрацию</button>
+    </form>
+</main>
+</body>
+</html>

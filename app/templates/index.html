@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+
+<body>
+    <div class="blurred-background-container">
+        <div class="blur-focus-area"></div>
+    </div>
+
+    <div class="top-menu">
+        <div class="logo">PASS-PORT BUSINESS</div>
+            <nav class="main-nav">
+        <ul>
+            <li><a href="#how-it-works">Как это работает?</a></li>
+            <li><a href="#algorithm">Алгоритм</a></li>
+            <li><a href="#cases">Кейсы</a></li>
+            <li><a href="#about-us">О компании</a></li>
+        </ul>
+      </nav>
+      <div class="actions">
+        <button class="presentation-button">Записаться на презентацию</button>
+        <span class="language">RU</span>
+      </div>
+    </div>
+  
+
+    <section id="how-it-works" style="padding: 50px; background-color: #eee; text-align: center;">
+        <h2>Как это работает?</h2>
+        <p>Информация о том, как это работает...</p>
+    </section>
+    <section id="algorithm" style="padding: 50px; background-color: #ddd; text-align: center;">
+        <h2>Алгоритм</h2>
+        <p>Описание алгоритма...</p>
+    </section>
+    <section id="cases" style="padding: 50px; background-color: #ccc; text-align: center;">
+        <h2>Кейсы</h2>
+        <p>Примеры наших кейсов...</p>
+    </section>
+    <section id="about-us" style="padding: 50px; background-color: #bbb; text-align: center;">
+        <h2>О компании</h2>
+        <p>Информация о нашей компании...</p>
+    </section>
+
+
+    <script>
+        const blurContainer = document.querySelector('.blurred-background-container');
+        const focusArea = document.querySelector('.blur-focus-area');
+        const blurRadius = 10; // Начальный радиус размытия
+        const focusRadius = 50; // Радиус области, где размытие уменьшается
+    
+        console.log('blurContainer:', blurContainer);
+        console.log('focusArea:', focusArea);
+    
+        blurContainer.addEventListener('mousemove', (event) => {
+            console.log('mousemove event triggered');
+            const containerRect = blurContainer.getBoundingClientRect();
+            const mouseX = event.clientX - containerRect.left;
+            const mouseY = event.clientY - containerRect.top;
+    
+            console.log('mouseX:', mouseX, 'mouseY:', mouseY);
+            console.log('containerRect:', containerRect);
+    
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+    
+            console.log('centerX:', centerX, 'centerY:', centerY);
+    
+            const distance = Math.sqrt(Math.pow(mouseX - centerX, 2) + Math.pow(mouseY - centerY, 2));
+            console.log('distance:', distance);
+    
+            // Рассчитываем новый радиус размытия на основе расстояния от центра
+            let newBlur = blurRadius - (blurRadius * Math.max(0, focusRadius - distance) / focusRadius);
+            newBlur = Math.max(0, newBlur); // Не допускаем отрицательных значений размытия
+            console.log('newBlur:', newBlur);
+    
+            blurContainer.style.filter = `blur(${newBlur}px)`;
+            console.log('blurContainer.style.filter:', blurContainer.style.filter);
+    
+            // Дополнительно: перемещение фокусной области для визуализации (необязательно)
+            focusArea.style.left = `${mouseX - focusRadius / 2}px`;
+            focusArea.style.top = `${mouseY - focusRadius / 2}px`;
+            focusArea.style.width = `${focusRadius}px`;
+            focusArea.style.height = `${focusRadius}px`;
+            console.log('focusArea.style.left:', focusArea.style.left, 'focusArea.style.top:', focusArea.style.top, 'focusArea.style.width:', focusArea.style.width, 'focusArea.style.height:', focusArea.style.height);
+        });
+    
+        blurContainer.addEventListener('mouseleave', () => {
+            console.log('mouseleave event triggered');
+            blurContainer.style.filter = `blur(${blurRadius}px)`;
+            focusArea.style.width = '0';
+            focusArea.style.height = '0';
+            console.log('blurContainer.style.filter (mouseleave):', blurContainer.style.filter, 'focusArea.style.width (mouseleave):', focusArea.style.width, 'focusArea.style.height (mouseleave):', focusArea.style.height);
+        });
+    
+    </script>
+
+</body>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.username }}'s Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/profile.css">
+
+    
+</head>
+
+<body>
+    <main class="container">
+        <nav>
+            <ul>
+                <li><strong><a href=" {{ url_for('main.index') }}">Pass-port</a></strong></li>
+            </ul>
+            <ul>
+                <li><a href="{{ url_for('auth_bp.logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+
+        <h1 id = "baka">Profile</h1>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul>
+            {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Profile Update Form -->
+        <form method="POST" action="{{ url_for('auth_bp.profile') }}">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="{{ user.name }}" required>
+            </div>
+            <div></div>
+                <label for="surname">Surname:</label>
+                <input type="text" id="surname" name="surname" value="{{ user.surname }}" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            <button type="submit">Update Profile</button>
+        </form>
+
+        <!-- Delete Profile Form -->
+        <form method="POST" action="{{ url_for('auth_bp.delete_profile') }}"
+            onsubmit="return confirm('Are you sure you want to delete your profile? This action cannot be undone.');">
+            <button type="submit" style="background-color: red; color: white;">Delete Profile</button>
+        </form>
+
+        <!-- Business Creation Form -->
+        <h2>Create a Business</h2>
+        <form method="POST" action="{{ url_for('auth_bp.create_business') }}">
+            <label for="name">Business Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="logo_url">Logo URL:</label>
+            <input type="text" id="logo_url" name="logo_url">
+
+            <label for="country">Country:</label>
+            <input type="text" id="country" name="country" required>
+
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" required>
+
+            <label for="street">Street:</label>
+            <input type="text" id="street" name="street" required>
+
+            <label for="house">House:</label>
+            <input type="text" id="house" name="house" required>
+
+            <label for="office">Office:</label>
+            <input type="text" id="office" name="office">
+
+            <label for="rating_threshold">Rating Threshold (if rating is more than the Threshold, sending user to a map application; otherwise, support):</label>
+            <input type="number" id="rating_threshold" name="rating_threshold" required min="1" max="5">
+
+            <label for="business_sector">Business Sector:</label>
+            <select id="business_sector" name="business_sector">
+                <option value="IT">IT</option>
+                <option value="Retail">Retail</option>
+                <option value="Manufacturing">Manufacturing</option>
+            </select>
+
+            <button type="submit">Create Business</button>
+        </form>
+
+        <!-- Editable List of Companies -->
+        <h2>Your Businesses</h2>
+        {% for company in user.companies %}
+        <div>
+            <form method="POST" action="{{ url_for('auth_bp.update_business', company_id=company.id) }}">
+                <input type="hidden" name="company_id" value="{{ company.id }}">
+
+                <label for="name_{{ company.id }}">Business Name:</label>
+                <input type="text" id="name_{{ company.id }}" name="name" value="{{ company.name }}" required>
+
+                <label for="logo_url_{{ company.id }}">Logo URL:</label>
+                <input type="text" id="logo_url_{{ company.id }}" name="logo_url" value="{{ company.logo_url }}">
+
+                <label for="country_{{ company.id }}">Country:</label>
+                <input type="text" id="country_{{ company.id }}" name="country" value="{{ company.country }}" required>
+
+                <label for="city_{{ company.id }}">City:</label>
+                <input type="text" id="city_{{ company.id }}" name="city" value="{{ company.city }}" required>
+
+                <label for="street_{{ company.id }}">Street:</label>
+                <input type="text" id="street_{{ company.id }}" name="street" value="{{ company.street }}" required>
+
+                <label for="house_{{ company.id }}">House:</label>
+                <input type="text" id="house_{{ company.id }}" name="house" value="{{ company.house }}" required>
+
+                <label for="office_{{ company.id }}">Office:</label>
+                <input type="text" id="office_{{ company.id }}" name="office" value="{{ company.office }}">
+
+                <label for="rating_threshold_{{ company.id }}">Rating Threshold:</label>
+                <input type="number" id="rating_threshold_{{ company.id }}" name="rating_threshold"
+                    value="{{ company.rating_threshold }}" required min="1" max="5">
+
+                <label for="business_sector_{{ company.id }}">Business Sector:</label>
+                <select id="business_sector_{{ company.id }}" name="business_sector">
+                    <option value="IT" {% if company.business_sector=='IT' %} selected {% endif %}>IT</option>
+                    <option value="Retail" {% if company.business_sector=='Retail' %} selected {% endif %}>Retail</option>
+                    <option value="Manufacturing" {% if company.business_sector=='Manufacturing' %} selected {% endif %}>Manufacturing</option>
+                </select>
+
+                <!-- QR Code Display -->
+                <label>QR Code for: <br><a href="{{request.host_url}}b/{{company.id}}">
+                        {{request.host_url}}b/{{company.id}}</a></label>
+                <img src="{{ url_for('qr_code_bp.generate_qr', company_id=company.id) }}"
+                    alt="QR Code for {{ company.name }}" style="max-width: 200px; height: auto;">
+
+                <!-- Button to trigger QR Code Download -->
+                <a href="{{ url_for('qr_code_bp.generate_qr', company_id=company.id) }}"
+                    download="qr_code_{{ company.id }}.png">
+                    <button type="button">Download QR Code</button>
+                </a>
+
+                <button style="margin-top: 1rem;" type="submit">Update Business</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('auth_bp.delete_business', company_id=company.id) }}"
+                onsubmit="return confirm('Are you sure you want to delete this business?');">
+                <button type="submit" style="background-color: red; color: white;">Delete Business</button>
+            </form>
+        </div>
+        {% endfor %}
+
+        <footer style="margin-top: 3rem; text-align: center;">
+            <small>&copy; 2025 MySite. All rights reserved.</small>
+        </footer>
+    </main>
+</body>
+
+</html>

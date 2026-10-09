@@ -1,0 +1,250 @@
+body {
+  font-family: sans-serif;
+}
+main.container {
+  border: 1px solid #e0b0ff; /* Светло-фиолетовая граница (светлая тема) */
+  background-color: #fff; /* Белый фон (светлая тема) */
+}
+
+h1 {
+  text-align: center;
+  color: #a78cd3; /* Нежный фиолетовый цвет (светлая тема) */
+  margin-bottom: 1.5rem;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #d689c1; /* Розовый цвет для меток (светлая тема) */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #d689c1; /* Розовая граница для полей ввода (светлая тема) */
+    border-radius: 3vw;
+    font-size: 1rem;
+    background-color: #fff; /* Белый фон полей ввода (светлая тема) */
+    color: #333; /* Темный цвет текста в полях ввода (светлая тема) */
+}
+
+
+button{
+  background-color: #c77dff; /* Яркий фиолетовый цвет кнопки (светлая тема) */
+  color: #fff; /* Белый текст кнопки (светлая тема) */
+  border: none;
+  border-radius: 3vw;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Top Menu */
+.top-menu {
+  width: 100%;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.main-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+
+.main-nav li {
+  margin-right: 20px;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #333;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.presentation-button {
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.language {
+  margin-left: 10px;
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* Color Variables */
+:root {
+  --primary-color: #e91e63;
+  --secondary-color: #9c27b0;
+  --background-light: #ffffff;
+  --background-dark: #121212;
+  --text-light: #000000;
+  --text-dark: #f5f5f5;
+}
+
+/* Light Theme */
+@media (prefers-color-scheme: light) {
+  body {
+    background-color: var(--background-light);
+    color: var(--text-light);
+  }
+
+  a,
+  button {
+    color: var(--primary-color);
+  }
+
+  button,
+  select,
+  input[type="text"],
+  input[type="email"],
+  input[type="number"] {
+    background-color: #fdfdfd;
+    color: var(--text-light);
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.5em 1em;
+    margin-bottom: 1em;
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: var(--secondary-color);
+  }
+}
+
+/* Dark Theme */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+  }
+
+  a,
+  button {
+    color: var(--primary-color);
+  }
+
+  button,
+  select,
+  input[type="text"],
+  input[type="email"],
+  input[type="number"] {
+    background-color: #1f1f1f;
+    color: var(--text-dark);
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 0.5em 1em;
+    margin-bottom: 1em;
+  }
+
+  button {
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: var(--primary-color);
+  }
+}
+
+
+p {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #00000000; /* Более нейтральный серый (светлая тема) */
+}
+
+
+p a {
+  color: #c77dff; /* Фиолетовый цвет ссылки (светлая тема) */
+  text-decoration: none;
+}
+
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  body {
+      background-color: #1e1e1e; /* Темно-серый фон */
+      color: #d4d4d4; /* Светло-серый текст */
+  }
+
+  main.container {
+      background-color: #333; /* Темно-серый фон контейнера */
+      border-color: #a78cd3; /* Светло-фиолетовая граница */
+  }
+
+  h1 {
+      color: #d689c1; /* Розовый цвет */
+  }
+
+  label {
+      color: #c77dff; /* Яркий фиолетовый */
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+      background-color: #444; /* Еще темнее фон полей ввода */
+      color: #eee; /* Светлый текст в полях ввода */
+      border-color: #c77dff; /* Яркий фиолетовый */
+  }
+
+  button[type="submit"] {
+      background-color: #f06292; /* Розовый цвет кнопки */
+      color: #1e1e1e; /* Темный текст кнопки */
+  }
+
+  button[type="submit"]:hover {
+      background-color: #e33371; /* Более темный розовый при наведении */
+  }
+
+  ul {
+      background-color: #552c55; /* Темно-фиолетовый фон ошибки */
+      border-color: #f77eb9; /* Яркая розовая граница ошибки */
+      color: #f77eb9; /* Яркий розовый текст ошибки */
+  }
+
+  p {
+      color: #bbb;
+  }
+
+  p a {
+      color: #d1aaff; /* Светлый фиолетовый цвет ссылки */
+  }
+
+  footer {
+      color: #777;
+  }
+}

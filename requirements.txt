@@ -1,0 +1,13 @@
+# Core dependencies
+flask
+requests
+redis
+sqlalchemy
+flask_sqlalchemy
+flask_migrate
+flask_login
+psycopg2-binary
+playwright
+regex
+qrcode
+logtail-python

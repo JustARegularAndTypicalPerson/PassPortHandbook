@@ -1,0 +1,113 @@
+div.content {
+    /* width: 1920px; */
+    height: 920px;
+    opacity: 1;
+    gap: 76px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: -100px;
+
+}
+
+div.logo-padding {
+    display: flex;
+    justify-content: center;
+
+
+}
+
+
+body {
+    /* display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; */
+    height: 100vh;
+    margin: 0;
+    font-family: system-ui, sans-serif;
+}
+
+.code-input {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    margin-top: -30px
+}
+
+.code-input input {
+    width: 44px;
+    height: 52px;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    background-color: #D9DBE6;
+}
+
+input:focus {
+    outline: none;
+}
+
+h1 {
+    display: flex;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 28px;
+    line-height: 124%;
+    letter-spacing: 0px;
+    text-align: center;
+    text-transform: uppercase;
+
+}
+
+h2 {
+    display: flex;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 112.00000000000001%;
+    letter-spacing: 0px;
+    text-align: center;
+    margin-top: -80px;
+    color: #858792;
+
+
+}
+
+.timer {
+    display: flex;
+    justify-content: center;
+    margin-top: -80px;
+}
+
+/* .resend-button {
+    width: 10vw;
+    height: 2vw;
+    display: none;
+    margin-left: 45vw;
+    margin-top: -3vw;
+    border: none;
+    border-radius: 2vw;
+    background-color: #f6b3d3;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    color: #37373e;
+    font-family: system-ui, sans-serif;
+    font-weight: 1000;
+    font-style: Semibold;
+    font-size: 16px;
+    line-height: 112.00000000000001%;
+    letter-spacing: -1%;
+    text-align: center;
+
+} */

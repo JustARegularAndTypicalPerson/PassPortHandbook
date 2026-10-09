@@ -1,0 +1,296 @@
+div.content {
+    width: 1920px;
+    height: 920px;
+    gap: 32px;
+    opacity: 1;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+div.frame17 {
+    width: 1216px;
+    height: 900px;
+
+}
+
+div.logo-padding {
+    margin-left: -608px;
+}
+
+div.registration {
+    width: 1216px;
+    height: 788px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+div.reg-ctrl {
+    width: 416px;
+    height: 788px;
+    gap: 32px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+h1.reg {
+    width: 416px;
+    text-align: center;
+}
+
+input {
+    width: 416px;
+    height: 48px;
+    border: none;
+    background-color: transparent;
+    border-radius: 14px;
+    padding-left: 14px;
+
+
+}
+
+div.input-container {
+    width: 416px;
+    height: 48px;
+    background-color: #F2F3F8;
+    border-radius: 14px;
+}
+
+span.title-for-input {
+    margin-bottom: -20px;
+    padding-left: 14px;
+}
+
+button {
+    width: 416px;
+    height: 52px;
+    border-radius: 14px;
+    opacity: 40%;
+    background-color: #F6B3D3;
+    font-family: system-ui, sans-serif;
+    font-weight: 600;
+    font-style: Semibold;
+    font-size: 16px;
+    line-height: 112.00000000000001%;
+    letter-spacing: -1%;
+    text-align: center;
+    border: transparent;
+
+
+}
+
+input:focus {
+    outline: transparent;
+}
+
+#tel {
+    position: relative;
+}
+
+#input-elem {
+    padding-left: 40px;
+    caret-color: transparent;
+    width: 376px;
+
+}
+
+::selection {
+    background-color: #f6b3d3;
+    color: #000000;
+
+}
+
+#tel::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 14px;
+    width: 20px;
+    height: 20px;
+    background-image: none;
+    background-size: contain;
+    opacity: 70%;
+}
+
+.input-container::after {
+    content: '';
+    position: absolute;
+    left: 380px;
+    top: 14px;
+    width: 20px;
+    height: 20px;
+    background-image: none;
+    background-size: contain;
+    opacity: 0%;
+}
+
+/* .input-container.active {
+    opacity: 1;
+}
+
+.input-container.active::before {
+    opacity: 1;
+}
+
+.input-container.active::after {
+    opacity: 30%;
+} */
+
+
+div.caretca-custom {
+    width: 3px;
+    height: 23px;
+    opacity: 0;
+    border-radius: 2px;
+    position: absolute;
+    z-index: 100;
+    background-color: black;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: left 0.1s;
+    background-color: #B94568;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+h1.reg {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 28px;
+    line-height: 124%;
+    letter-spacing: 0px;
+    text-align: center;
+    text-transform: uppercase;
+
+}
+
+.input-container {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 112.00000000000001%;
+    letter-spacing: 0px;
+
+}
+
+
+h1.content {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    line-height: 136%;
+    letter-spacing: -1%;
+    text-align: center;
+    color: #D2D1DE;
+
+
+}
+
+a.inner-url {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 14px;
+    line-height: 136%;
+    letter-spacing: -1%;
+    text-align: center;
+    text-decoration: underline;
+    text-decoration-style: solid;
+    text-decoration-thickness: 0%;
+    text-decoration-skip-ink: auto;
+    color: #D2D1DE;
+
+
+}
+
+.title-for-input {
+    font-family: system-ui, sans-serif;
+    font-weight: 400;
+    font-style: Regular;
+    font-size: 16px;
+    line-height: 112.00000000000001%;
+    letter-spacing: 0px;
+    color: #D2D1DE;
+
+}

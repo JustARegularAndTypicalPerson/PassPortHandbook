@@ -1,0 +1,28 @@
+div.logo-container {
+    position: relative;
+    width: 347px;
+    height: 46px;
+    overflow: hidden;
+}
+
+div.first-icon-container{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color:#F6B3D3;
+    z-index: 1;}
+
+div.second-icon-container{
+    position: absolute;
+    top: 28px;
+    left: 16px;
+    width: 24.75px;
+    height: 24.75px;
+    border-radius: 10px;
+    background-color:#292949;
+    opacity: 0.08;
+    z-index: 2;
+}
